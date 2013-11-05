@@ -2,7 +2,7 @@
 var pcap = require("pcap"),
 	os = require('os'),
 	ifaces = os.networkInterfaces(),
-	idev = 'en1',
+	idev = 'en0',
 	pcap_session = pcap.createSession(idev, "tcp"),
 	matcher = /safari/i,
 	tcp_tracker = new pcap.TCP_tracker(),
@@ -11,10 +11,13 @@ var pcap = require("pcap"),
 	time;
 // webserver
 var connect = require('connect'),
-	port = 9999,
-	app = connect.createServer(connect.static(__dirname + '/public').listen(port)),
+	port = 3000,
+	app = connect.createServer(
+	connect.static(__dirname + '/public') // two underscores
+).listen(port);
 // socket communication
 	io = require('socket.io').listen(app);
+	io.set('log level', 2); // reduce logging
 	io.sockets.on('connection', function(socket) {
 		time = new Date().getTime();
 		socket.emit('greet', {time: time});
@@ -66,13 +69,14 @@ pcap_session.on('packet', function(raw_packet) {
 		// substring >H<ost and before Connection
 		var host = query.substring(query.indexOf('Host: ') + 6, query.indexOf('Connection:') - 2);
 		var url = query.substring(query.indexOf('/'), query.indexOf(' HTTP/1.1'));
-		console.log('http://' + host + url + '\n----------------------');
-		// console.log(data.toString() + '\n----------------------');
+		var uri = 'http://' + host + url;
+		console.log(uri + '\n----------------------');
 	}
 });
 
-var googip = ['173.194.43.3', '173.194.74.189', '173.194.76.189', '74.125.226.213'],
+var googips = ['173.194.43.3', '173.194.74.189', '173.194.76.189', '74.125.226.213'],
 // contains 173.194 or  analytic = 74.125 or akamaihd = 23.67.244
-	facebookip = ['31.13.69.160'],
-	twitterip = ['199.16.156'],
+	bullshitips = ['gstatic', 'dropbox', 'chartbeat', '74.125.228', 'imgclck', 'doubleclick', 'dishdigital', 'dmtry'],
+	facebookips = ['31.13.69.160'],
+	twitterips = ['199.16.156'],
 	usefulFilter = ['suggestqueries', '?q=', 'yimg', 'distilleryimage', 'pinimg', '/wiki/', '.ico'];

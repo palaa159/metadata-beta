@@ -1,24 +1,23 @@
 <html>
 <head>
 	<link rel="stylesheet" href="css/bootstrap.min.css">
-	<link rel="stylesheet" href="css/main.css"></head>
+	<link rel="stylesheet" href="css/data_google_main.css">
+	<link rel="stylesheet" href="js/counter/jquery.counter-analog2.css"></head>
 <body>
 	<div id="container">
-		<h1>Please register to board your data trip.</h1>
-		<p>
-			By clicking the agree button, you comply and allow to be tracked while you are web-browsing.
-		</p>
-		<p>
-			<button type="button" class="btn btn-default btn-lg">Accept</button>
-			<button type="button" class="btn btn-default btn-lg">Are you kidding me?</button>
-		</p>
+		<img id="gometer" src="img/gometer.png">
+		<div id="counterContainer">
+			<span id="countBytes" class="counter counter-analog2" data-direction="up" data-interval="10" data-format="99999999" data-stop="5">0</span>
+		</div>
+		<div id="suffix">bytes of your data have been collected in Mountain View <br>since <span id="since">seconds ago.</span></div>
 	</div>
 
 	<script src="js/vendor/jquery.min.js"></script>
+	<script src="js/counter/jquery.counter.js"></script>
 	<script src="js/vendor/bootstrap.min.js"></script>
 	<script src="js/vendor/moment.js"></script>
-	<script src="http://localhost:3000/socket.io/socket.io.js"></script>
+	<script src="http://localhost:3001/socket.io/socket.io.js"></script>
 	<script src="js/connect.js"></script>
-	<script src="js/register_main.js"></script>
+	<script src="js/data_google_main.js"></script>
 </body>
 </html>

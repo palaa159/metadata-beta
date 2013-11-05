@@ -1,4 +1,4 @@
-var googips = ['173.194.43', '173.194.74', '173.194.76', '74.125.226'],
+var googips = ['173.194', '74.125.226', '74.125.228'],
 	// contains 173.194 or  analytic = 74.125 or akamaihd = 23.67.244
 	bullshitips = ['gstatic', 'dropbox', 'chartbeat', '74.125.228', 'imgclck', 'doubleclick', 'dishdigital', 'dmtry'],
 	facebookips = ['31.13.69.160'],
@@ -19,6 +19,7 @@ var pcap = require("pcap"),
 // webserver
 var connect = require('connect'),
 	port = 3000,
+	sPort = 3001,
 	app = connect.createServer(
 		connect.static(__dirname + '/public') // two underscores
 	).listen(port);
@@ -63,6 +64,7 @@ pcap_session.on('packet', function(raw_packet) {
 	// inject google ips
 
 	function checkGoogleIP(ip, array) {
+		// console.log(ip);
 		// console.log('starting checkGoogleIP with ' + ip);
 		for (var i = 0; i < array.length; i++) {
 			if (ip.match(array[i])) {
@@ -76,6 +78,12 @@ pcap_session.on('packet', function(raw_packet) {
 	// checkGoogleIP(dst_ip, googips);
 
 	function data_google() {
+		if (src_ip == ip && data_byte > 0) {
+			console.log('data ' + data_byte);
+			io.sockets.emit('data all', {
+				size: data_byte
+			});
+		}
 		if (src_ip == ip && data_byte > 0 && checkGoogleIP(dst_ip, googips) == true) {
 			console.log('ding!–––––––––it\'s google–––––––––' + ' with ' + data_byte + ' bytes');
 			io.sockets.emit('data google', {

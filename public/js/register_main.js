@@ -8,35 +8,7 @@ $(document).ready(function() {
 	);
 });
 
-// FIND IP
-var IP,
-	IPs = [],
-	locations = [];
-// SOCKET.IO
-var app = {
-	begin_track: null
-};
-// 
-socket.on('greet', function(data) {
-	// send back IP
-	socket.emit('connection ip', {
-		ip: IP
-	});
-	app.begin_track = data.time;
-	console.log(moment(app.begin_track).fromNow());
+$('#accept').click(function() {
+	socket.emit('user comply', IP);
+	$('#container').html('<h1>Thank you. Now you can close this window.</h1>');
 });
-
-socket.on('sending data', function(data) {
-	var toIP = data.to,
-		port = data.port,
-		size = data.size;
-	// check existence
-	if($.inArray(IPs) !== 1) {
-		IPs.push(toIP);
-		getLocation(toIP);
-	}
-});
-
-function getLocation(location) {
-
-}

@@ -24,7 +24,7 @@ var connect = require('connect'),
 		connect.static(__dirname + '/public') // two underscores
 	).listen(port);
 // socket communication
-io = require('socket.io').listen(app);
+io = require('socket.io').listen(sPort);
 io.set('log level', 2); // reduce logging
 io.sockets.on('connection', function(socket) {
 	time = new Date().getTime();
@@ -117,6 +117,17 @@ pcap_session.on('packet', function(raw_packet) {
 			var url = query.substring(query.indexOf('/'), query.indexOf(' HTTP/1.1'));
 			var uri = 'http://' + host + url;
 			console.log(uri + '\n----------------------');
+			// filtering useful stuff
+			for(var i = 0; i < usefulFilter.length; i++) {
+				if(uri.match(usefulFilter[i])) {
+					io.sockets.emit('usable uri', {
+						uri: uri
+					});
+				}
+			}
+
 		}
 	}
+
+	
 });

@@ -9,7 +9,7 @@ socket.on('data google', function(data) {
 		stop: bytes,
 		interval: 100
 	});
-	$('#since').html(moment(time).fromNow() + '. That\'s ' + bytes/allBytes*100 + ' % of all traffics.');
+	$('#since').html(moment(time).fromNow() + '. That\'s ' + (bytes/allBytes*100).toFixed(2) + '% of your outgoing traffics.');
 });
 
 socket.on('data all', function(data) {
@@ -49,4 +49,4 @@ window.onresize = function() {
 		top: sH/2 + 105 - adjust,
 		left: sW/2 - $('#suffix').width()/2
 	});
-}
+};

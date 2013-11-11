@@ -3,13 +3,20 @@ var googips = ['173.194', '74.125.226', '74.125.228'],
 	bullshitips = ['gstatic', 'dropbox', 'chartbeat', '74.125.228', 'imgclck', 'doubleclick', 'dishdigital', 'dmtry'],
 	facebookips = ['31.13.69.160'],
 	twitterips = ['199.16.156'],
-	usefulFilter = ['suggestqueries', '?q=', 'yimg', 'distilleryimage', 'pinimg', '/wiki/', '.ico'];
-
+	usefulFilter = ['.html', 'suggestqueries', 'ytimg', 'com/watch?v=', 'distilleryimage', 'pinimg', 'en.wikipedia.org/wiki/', 'favicon.ico'],
+	// wiki search
+	wikiFilter = ['en.wikipedia.org/wiki/'],
+	// google search
+	googleFilter = ['suggestqueries', 'google.com/search?q='],
+	// pinterest
+	pinFilter = ['pin/?q='],
+	favicon = ['favicon.ico'];
 // VARIABLES
 var pcap = require("pcap"),
 	os = require('os'),
 	ifaces = os.networkInterfaces(),
 	idev = 'en0',
+	fs = require('fs'),
 	pcap_session = pcap.createSession(idev, "tcp"),
 	matcher = /safari/i,
 	tcp_tracker = new pcap.TCP_tracker(),
@@ -50,7 +57,7 @@ for (var dev in ifaces) {
 }
 //
 console.log("Listening on " + pcap_session.device_name + " on IP: " + ip);
-
+var tmpArray = [];
 // when there's a packet coming
 pcap_session.on('packet', function(raw_packet) {
 	var packet = pcap.decode.packet(raw_packet),
@@ -77,7 +84,7 @@ pcap_session.on('packet', function(raw_packet) {
 	// test checkGoogleIP function
 	// checkGoogleIP(dst_ip, googips);
 
-	function data_google() {
+	function data_to_google() {
 		if (src_ip == ip && data_byte > 0) {
 			console.log('data ' + data_byte);
 			io.sockets.emit('data all', {
@@ -92,7 +99,7 @@ pcap_session.on('packet', function(raw_packet) {
 		}
 	}
 
-	data_google();
+	// data_to_google();
 
 	function data_all() {
 		// if I just sent whatever data
@@ -106,20 +113,34 @@ pcap_session.on('packet', function(raw_packet) {
 		}
 	}
 
-	function data_http_request() {
+	function data_http_request(filter) {
 		// if user is making http request
 		if (data && matcher.test(data.toString())) {
-			console.log(pcap.print.packet(packet));
+			// console.log(pcap.print.packet(packet));
 			var query = data.toString();
 			// find Host + GET
 			// substring >H<ost and before Connection
 			var host = query.substring(query.indexOf('Host: ') + 6, query.indexOf('Connection:') - 2);
 			var url = query.substring(query.indexOf('/'), query.indexOf(' HTTP/1.1'));
 			var uri = 'http://' + host + url;
-			console.log(uri + '\n----------------------');
 			// filtering useful stuff
-			for(var i = 0; i < usefulFilter.length; i++) {
-				if(uri.match(usefulFilter[i])) {
+			for(var i = 0; i < filter.length; i++) {
+				if(uri.match(filter[i])) {
+					time = new Date().getTime();
+					var tmpJson = {
+						time: time,
+						uri: uri
+					};
+					tmpArray.push(tmpJson);
+					var path = 'favicon_2.json';
+					fs.writeFile(path, JSON.stringify(tmpArray, null, 4), function(err) {
+						if(err) {
+							console.log(err);
+						} else {
+							console.log('–––writing to file––––');
+						}
+					});
+					console.log(uri + '\n----------------------');
 					io.sockets.emit('usable uri', {
 						uri: uri
 					});
@@ -128,6 +149,6 @@ pcap_session.on('packet', function(raw_packet) {
 
 		}
 	}
-
+	data_http_request(favicon);
 	
 });
